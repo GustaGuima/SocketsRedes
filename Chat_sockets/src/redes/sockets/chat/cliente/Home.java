@@ -2,7 +2,10 @@ package redes.sockets.chat.cliente;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,15 +16,19 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import redes.sockets.chat.common.Utils;
+
 public class Home extends JFrame{
 	private static final long serialVersionUID = 1L;
 
+	private ArrayList<String> connectedUsers;
+	
 	private String connectionInfo;
 	private Socket connection;
 	
 	private JLabel tittle;
 	private JButton getConnected, startTalk;
-	private JList<?> list;
+	private JList list;
 	private JScrollPane scroll;
 	
 	public Home(Socket connection ,String connectionInfo) {
@@ -36,6 +43,7 @@ public class Home extends JFrame{
 	}
 
 	public void iniciarComponentes(){
+		connectedUsers = new ArrayList<>();
 		tittle = new JLabel("Usuario:  "+ connectionInfo.split(":")[0],SwingConstants.CENTER);
 		getConnected = new JButton("Atualizar Contatos");
 		startTalk = new JButton("Iniciar Conversa");
@@ -76,12 +84,54 @@ public class Home extends JFrame{
 		this.add(scroll);
 	}
 	
-	public void inserirAcoes() {	
+	public void inserirAcoes() {
+		this.addWindowListener(new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				Utils.sendMessage(connection, "QUIT");
+				System.out.println("Conexao Encerrada.");
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {}
+		});
+		
+		getConnected.addActionListener(event -> getConnectedUser());
 	}
 	
 	public void start() {
 		this.pack();
 		this.setVisible(true);
+	}
+	
+	private void getConnectedUser() {
+		Utils.sendMessage(connection, "GET_CONNECTED_USERS");
+		String response = Utils.receivedMessage(connection);
+		list.removeAll();
+		connectedUsers.clear();
+		for(String info : response.split(";")) {
+			if(!info.equals(connectionInfo)) {
+				connectedUsers.add(info);
+			}	
+		}
+		list.setListData(connectedUsers.toArray());
+		
 	}
 	
 }

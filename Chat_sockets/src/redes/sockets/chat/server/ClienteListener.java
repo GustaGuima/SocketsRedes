@@ -1,5 +1,6 @@
 package redes.sockets.chat.server;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.Map;
 
@@ -34,6 +35,12 @@ public class ClienteListener implements Runnable{
 		while(running) {
 			message = Utils.receivedMessage(connection);
 			if(message.equals("QUIT")) {
+				server.getClients().remove(connectionInfo);
+				try {
+					connection.close();
+				} catch (IOException e) {
+					System.out.println("[ClientListener:Run] -> "  +e.getMessage());
+				}
 				running = false;
 			}else if(message.equals("GET_CONNECTED_USERS")) {
 				System.out.println("Solicitaçao de atualizar lista de contatos...");

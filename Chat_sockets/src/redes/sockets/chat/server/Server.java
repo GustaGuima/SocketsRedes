@@ -6,8 +6,6 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.plaf.SliderUI;
-
 import redes.sockets.chat.common.Utils;
 
 public class Server {
@@ -51,7 +49,7 @@ public class Server {
 		String[] splited = connectionInfo.split(":");
 		
 		for(Map.Entry<String, ClienteListener> pair : clients.entrySet()) {
-			String[] parts = pair.getKey().split(":");
+			String[] parts = pair.getKey().split(";");
 			if(parts[0].toLowerCase().equals(splited[0].toLowerCase())) {
 				return false;
 			}else if((parts[1] + parts[2]).equals(splited[1] + splited[2])){
@@ -59,6 +57,10 @@ public class Server {
 			}
 		}
 		return true;
+	}
+	
+	public static void main(String[] args) {
+		Server server = new Server();
 	}
 
 }

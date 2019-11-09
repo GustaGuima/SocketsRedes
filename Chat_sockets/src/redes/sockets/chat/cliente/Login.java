@@ -33,7 +33,6 @@ public class Login extends JFrame{
 		inserirComponentes();
 		inserirAcoes();
 		start();
-		
 	}
 	
 	public void iniciarComponentes(){
@@ -89,7 +88,7 @@ public class Login extends JFrame{
 				Socket connection = new Socket(Server.host, Server.port);
 				String connectionInfo = (username + ":" + connection.getLocalAddress().getHostAddress() + ":" + port);
 				Utils.sendMessage(connection, connectionInfo);
-				if(Utils.receivedMessage(connection).toLowerCase().equals("SUCESS")){
+				if(Utils.receivedMessage(connection).equals("SUCESS")){
 					new Home(connection, connectionInfo);
 					this.dispose();
 				}else {
