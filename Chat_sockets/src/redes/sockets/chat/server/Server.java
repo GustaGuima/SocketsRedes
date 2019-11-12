@@ -10,7 +10,7 @@ import redes.sockets.chat.common.Utils;
 
 public class Server {
 	
-	public static final String host = "127.0.0.1";
+	public static final String host = "192.168.25.93";
 	public static final int port = 4444;
 	
 	private ServerSocket server;
@@ -49,7 +49,7 @@ public class Server {
 		String[] splited = connectionInfo.split(":");
 		
 		for(Map.Entry<String, ClienteListener> pair : clients.entrySet()) {
-			String[] parts = pair.getKey().split(";");
+			String[] parts = pair.getKey().split(":");
 			if(parts[0].toLowerCase().equals(splited[0].toLowerCase())) {
 				return false;
 			}else if((parts[1] + parts[2]).equals(splited[1] + splited[2])){

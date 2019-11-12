@@ -28,7 +28,6 @@ public class ClienteListener implements Runnable{
 		this.running = running;
 	}
 
-	@Override
 	public void run() {
 		running = true;
 		String message;

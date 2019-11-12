@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import redes.sockets.chat.common.Utils;
+
 public class Chat extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
@@ -28,12 +33,15 @@ public class Chat extends JFrame{
 	private JPanel panel;
 	private JScrollPane scroll;
 	
-	
+	private TelaHome home;
+	private Socket connection;
 	private ArrayList<String> messageList;
 	private String connectionInfo;
 	
-	public Chat(String connectionInfo, String tittle) {
+	public Chat(TelaHome home, Socket connection, String connectionInfo, String tittle) {
 		super("Chat - " + tittle);
+		this.connection = connection;
+		this.home = home;
 		this.connectionInfo = connectionInfo;
 		iniciarComponentes();
 		configurarComponentes();
@@ -93,6 +101,54 @@ public class Chat extends JFrame{
 				
 			}
 		});
+		
+		this.addWindowListener(new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				Utils.sendMessage(connection, "CHAT_CLOSED");
+				home.getOpenedChats().remove(connectionInfo);
+				home.getConnectedListeners().get(connectionInfo).setChatOpen(false);
+				home.getConnectedListeners().get(connectionInfo).setRunning(false);
+				home.getConnectedListeners().remove(connectionInfo);
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	public void appendMessage(String received) {
@@ -107,9 +163,10 @@ public class Chat extends JFrame{
 	
 	private void send() {
 		if(sendMessages.getText().length() > 0) {
-		DateFormat df = new SimpleDateFormat("hh:mm:ss");
-		appendMessage("<b>["+ df.format(new Date())+"] Eu: </b><i>"+ sendMessages.getText() + "</i><br>");
-		sendMessages.setText("");
+			DateFormat df = new SimpleDateFormat("hh:mm:ss");
+			Utils.sendMessage(connection, "MESSAGE;"+"<b>["+ df.format(new Date())+"] "+this.getTitle().split(":")[0] +": </b><i>"+ sendMessages.getText() + "</i><br>");
+			appendMessage("<b>["+ df.format(new Date())+" ] Eu: </b><i>"+ sendMessages.getText() + "</i><br>");
+			sendMessages.setText("");
 		}
 	}
 	
@@ -117,10 +174,6 @@ public class Chat extends JFrame{
 	public void start() {
 		this.pack();
 		this.setVisible(true);
-	}
-	
-	public static void main(String[] args) {
-		Chat chat = new Chat("Gustavo:127.0.0.1", "Ali");
 	}
 	
 
